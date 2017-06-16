@@ -1,0 +1,158 @@
+@charset "utf-8";
+*{
+    padding: 0;
+    margin: 0;
+}
+ul,li{
+    display: block;
+}
+.left_content{
+    width: 200px;
+    height: 100%;
+    background: #47454b;
+}
+.nav{
+    width: 100%;
+    height: 35px;
+    background: #313131;
+    transition: all .2s ease-out;
+    position: relative;
+    left: 0;
+    top: 0;
+    box-shadow: 0px 1px 1px rgba(0,0,0,.3);
+}
+html,body{
+    background: #d0d0d0;
+    width: 100%;
+    height: 100%;
+    font-family: '微软雅黑';
+    -webkit-user-select:none;
+    -moz-user-select:none;
+    -ms-user-select:none;
+    user-select:none;
+    position: relative;
+}
+#content{
+    width: 100%;
+    height: calc(100% - 35px);
+    position: relative;
+    overflow: hidden;
+}
+#content>div,.content{
+    width: 100%;
+    height: 100%;
+}
+.content>*{
+    float: left;
+    display: block;
+}
+.content:after{
+    content: '';
+    clear: both;
+    display: block;
+}
+.list_title{
+    width: 100%;
+    height: 30px;
+    line-height: 30px;
+    color: rgba(255,255,255,.6);
+    border-bottom:1px solid #5d5a63;
+    font-size: 14px;
+    font-weight: bold;
+    box-shadow: 0px 1px 1px rgba(0,0,0,.5);
+    cursor: default;
+}
+.list_block{
+    display: block;
+    width: 100%;
+    height: auto;
+}
+.list_item{
+    width: 60px;
+    float: left;
+    zIndex:99999;
+}
+.drag_item{
+    width: 60px;
+    position: absolute;
+    background: #47454b;
+    border:2px solid rgba(255,255,255,.2);
+    display: none;
+}
+.list_block:after{
+    content: '';
+    clear: both;
+    display: block;
+}
+.list_item>.iconfont:before{
+    font-size: 40px;
+    width: 100%;
+    text-align: center;
+    display: block;
+}
+.icon_info{
+    width: 100%;
+    font-size: 12px;
+    height: 14px;
+    line-height: 14px;
+    text-align: center;
+    cursor: default;
+}
+.drag-item{
+    cursor: pointer;
+}
+.canvas{
+    width: calc(100% - 200px);
+    height: 100%;
+}
+#canvas{
+    display: block;
+    width: 100%;
+    height: 100%;
+    position: relative;
+    overflow: auto;
+}
+.component{
+    outline: 1px dashed #555;
+}
+.resizeBox{
+    width: auto;
+    height: auto;
+    position: static;
+    cursor:  default;
+}
+.resizeBox>.n{
+    position: absolute;
+    cursor: n-resize;
+    height: 5px;
+}
+.resizeBox>.e{
+    position: absolute;
+    cursor: e-resize;
+    width: 5px;
+}
+.resizeBox>.w{
+    position: absolute;
+    cursor: w-resize;
+    width: 5px;
+}
+.resizeBox>.s{
+    position: absolute;
+    cursor: s-resize;
+    height: 5px;
+}
+.resizeBox>.se{
+    position: absolute;
+    cursor: se-resize;
+    height: 5px;
+    width: 5px;
+}
+.resizeBox.drag{
+    z-index: 9999;
+    background: rgba(0,0,0,.2);
+    cursor: move;
+}
+
+.resizeBox.drag *{
+    cursor: move;
+}
