@@ -6,11 +6,23 @@
  **/
 
 import Style from './style'
-import Immutable from 'immutable';
+import Immutable from '../../immutableSrc/immutable';
 import _ from '../../utils/utils'
 import componentMap from '../componentMap'
 
-export default class component extends Immutable.Map{
+function OwnerID() {};
+
+function makeComponent(size, root, ownerID, hash){
+    const component = Object.create(ComponentPrototype);
+    component.size = size;
+    component._root = root;
+    component.__ownerID = ownerID;
+    component.__hash = hash;
+    component.__altered = false;
+    return component;
+}
+
+class Component extends Immutable.Map{
     constructor(offset,icon){
         let style=new Style({
             left:offset.left,
@@ -21,11 +33,46 @@ export default class component extends Immutable.Map{
         }),_attrs = Immutable.Map({className:"component"});
         super({style,_attrs});
 
-        //需要重新添加原属性，被Map覆盖
-        this.__proto__ = component.prototype;
+        if(this.__proto__ !== Component.prototype) {
+            this.__proto__ = Component.prototype;
+        }
         this.icon = icon;
         this.id = _.guid();
         this.style = this.get("style");//方便代码操作
+    }
+    /**
+     * @method getNewCom 取得新的component对象属性引用不变
+     * */
+    getNewCom(){
+        let newCom = makeComponent(this.size, this._root, new OwnerID(), this.__hash),methods;
+        methods =Object.keys(this);
+        methods.map(e=>{
+            if(!newCom[e]){
+                newCom[e] = this[e];
+            }
+        });
+        return newCom;
+    }
+    /**
+     * @method 在每次修改Map对象时回调该方法
+     * */
+    recoveryData(prevData){
+        if(prevData && prevData.constructor === Component) {
+            this.icon = prevData.icon;
+            this.id = prevData.id;
+            this.style = this.get("style");
+        }
+    }
+    __ensureOwner(ownerID){
+        if (ownerID === this.__ownerID) {
+            return this;
+        }
+        if (!ownerID) {
+            this.__ownerID = ownerID;
+            this.__altered = false;
+            return this;
+        }
+        return makeComponent(this.size, this._root, ownerID, this.__hash);
     }
     set attrs(val){
         if(Immutable.Map.isMap(val)) {
@@ -65,10 +112,12 @@ export default class component extends Immutable.Map{
         if(this.icon){
             let comName = this.icon[0].toUpperCase()+this.icon.slice(1),reactComponent=componentMap[comName];
             if(!reactComponent){
-                console.error(`no find reactComponent named ${comName},make sure add ${comName} code`);
-                reactComponent = componentMap.ComponentBase;
+                throw new Error(`no find reactComponent named ${comName},make sure add ${comName} code`);
+                //reactComponent = componentMap.ComponentBase;
             }
             return reactComponent;
         }
     }
 }
+const ComponentPrototype = Component.prototype;
+export default Component;

@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import server from '../utils/server'
 import List from './leftSlider/List'
-import Immutable from 'immutable';
+import Immutable from '../immutableSrc/immutable';
 import DragItem from './leftSlider/DragItem'
 import Paint from './Paint'
 import {immutableRenderDecorator} from 'react-immutable-render-mixin';

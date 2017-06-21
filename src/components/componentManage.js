@@ -1,14 +1,9 @@
-/**
- *    @class componentManage 对组件Immutable数据进行管理 历史记录以及增删改查，这个模块代码尚未写完，需要重写Component在Immutable的大
- * 部分接口deleteIn/setIn等等保持整颗页面树同步刷新生成新的Immutable对象。
- *  @constructor components 页面初始化组件对象
- *
- **/
-
-import Immutable from 'immutable';
+import Immutable from '../immutableSrc/immutable';
 import _ from '../utils/utils'
 
-export default class componentManage{
+const maxHistory = 10;
+
+export default class {
     constructor(components){
         if(_.isArray(components)){
             let componentMap = {};
@@ -16,8 +11,8 @@ export default class componentManage{
                 if (!componentMap[e.id]) {
                     componentMap[e.id] = e;
                 }
-            })
-            this.$$componetMap = Immutable.Map(componentMap);
+            });
+            this.$$componetMap = Immutable.Map(componentMap);  //fromJS 深拷贝转化成
             this.$$components = Immutable.List(components);
             this.history = [this.$$components];
             this.mapHistory = [this.$$componetMap];
@@ -135,13 +130,23 @@ export default class componentManage{
         }
 
         this.$$componetMap = this.$$componetMap.set(component.id,component);
-        this.history.push(this.$$components);
-        this.historyIndex++;
+        this.updateHistory();
     }
     remove(componentId){
         if(componentId){
             let com = this.$$componetMap.get(componentId);
             this._delete(com);
+            this.updateHistory();
+        }
+    }
+    updateHistory(){
+        this.history.push(this.$$components);
+        this.historyIndex++;
+        this.mapHistory.push(this.$$componetMap);
+        if(this.historyIndex>9){
+            this.historyIndex = 9;
+            this.history.shift();
+            this.mapHistory.shift();
         }
     }
 }

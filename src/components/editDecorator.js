@@ -1,5 +1,5 @@
 /**
- *  @class  editDecorator.js  组件的编辑装饰器，实现拖拽，缩放等编辑状态封装
+ *   editDecorator.js  组件的编辑装饰器，实现拖拽，缩放等编辑状态封装
  * **/
 import React, { Component } from 'react'
 import {findDOMNode} from 'react-dom'

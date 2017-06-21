@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import Immutable from 'immutable';
+import Immutable from '../immutableSrc/immutable';
 import server from '../utils/server'
 import component from '../components/componentData/component'
 import {immutableRenderDecorator} from 'react-immutable-render-mixin';

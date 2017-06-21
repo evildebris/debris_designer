@@ -1,4 +1,4 @@
-import Immutable from 'immutable';
+import Immutable from '../../immutableSrc/immutable';
 import _ from '../../utils/utils'
 
 const posStyle = ['left','top','right','bottom','margin','marginLeft','marginTOP','marginRight','marginBottom','position','zIndex'];
