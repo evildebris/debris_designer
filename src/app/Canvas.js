@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import server from '../utils/server'
 import List from './leftSlider/List'
-import Immutable from '../immutableSrc/immutable';
 import DragItem from './leftSlider/DragItem'
 import Paint from './Paint'
 import {immutableRenderDecorator} from 'react-immutable-render-mixin';
@@ -11,7 +10,6 @@ class Canvas extends Component {
     constructor(props){
         super(props);
         this.state={
-            components:Immutable.List([]),
             deleteComponentId:[]
         }
     }
@@ -85,7 +83,7 @@ class Canvas extends Component {
                     <List></List>
                 </div>
                 <div id="paint" className="canvas">
-                    <Paint id="canvas" components="" deleteComponent={this.state.deleteComponentId}></Paint>
+                    <Paint id="canvas" deleteComponent={this.state.deleteComponentId}></Paint>
                 </div>
                 <div id="attrEditor"></div>
                 <DragItem />
@@ -106,15 +104,6 @@ class Canvas extends Component {
             this.boxMove = true;
             boxEvents && (this.boxEvents=boxEvents);
         })
-        window.addEventListener && window.addEventListener('keyup',(e)=>{
-            if('Delete' === e.key){
-                if(this.boxEvents&&this.boxEvents.id){
-                    this.setState({
-                        deleteComponentId:[this.boxEvents.id]
-                    });
-                }
-            }
-        });
     }
 }
 export default Canvas

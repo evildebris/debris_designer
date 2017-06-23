@@ -31,7 +31,7 @@ class Component extends Immutable.Map{
             width:300,
             height:200
         }),_attrs = Immutable.Map({className:"component"});
-        super({style,_attrs});
+        super({style,_attrs,children:Immutable.List([])});
 
         if(this.__proto__ !== Component.prototype) {
             this.__proto__ = Component.prototype;
@@ -39,6 +39,7 @@ class Component extends Immutable.Map{
         this.icon = icon;
         this.id = _.guid();
         this.style = this.get("style");//方便代码操作
+        this.children = this.get("children");//方便代码操作
     }
     /**
      * @method getNewCom 取得新的component对象属性引用不变
@@ -53,6 +54,13 @@ class Component extends Immutable.Map{
         });
         return newCom;
     }
+    copy(){//深拷贝
+        let component = Object.create(Component.prototype);
+        component.size = this.size;
+        component.__ownerID = new OwnerID();
+        component.__altered = false;
+
+    }
     /**
      * @method 在每次修改Map对象时回调该方法
      * */
@@ -60,19 +68,11 @@ class Component extends Immutable.Map{
         if(prevData && prevData.constructor === Component) {
             this.icon = prevData.icon;
             this.id = prevData.id;
+            this.path = prevData.path;
+            this.parentId = prevData.parentId;
             this.style = this.get("style");
+            this.children = this.get("children");
         }
-    }
-    __ensureOwner(ownerID){
-        if (ownerID === this.__ownerID) {
-            return this;
-        }
-        if (!ownerID) {
-            this.__ownerID = ownerID;
-            this.__altered = false;
-            return this;
-        }
-        return makeComponent(this.size, this._root, ownerID, this.__hash);
     }
     set attrs(val){
         if(Immutable.Map.isMap(val)) {

@@ -3,11 +3,14 @@
  * 单态模式：server用于不同组件之间通信
  * i hate react
  */
+import componentManage from '../components/componentManage';
+const manage = new componentManage([]);
 class Server{
     constructor() {
         if (!Server.created) {
             Server.instance = this;
             Server.created = true
+            Server.instance.manage = manage;
         }
         return Server.instance
     }
@@ -58,5 +61,5 @@ class Server{
         }
     }
 }
-let server = new Server()
+let server = new Server();
 export default server

@@ -6,14 +6,19 @@ import {findDOMNode} from 'react-dom'
 import server from '../utils/server'
 import _ from '../utils/utils'
 
+const manage = server.manage;
+
 export default function editDecorator(Target) {
     class editBox extends Component {
         constructor(props){
             super(props);
             this.state = {
                 drag:false,
-                n:0
+                n:0,
+                active:true
             };
+            this.style = this.props.component.style.getPosStyle();
+            this.component = this.props.component;
             this.changePos = this.changePos.bind(this);
             this.boxMouseUp = this.boxMouseUp.bind(this);
             this.boxMouseMove = this.boxMouseMove.bind(this);
@@ -21,6 +26,7 @@ export default function editDecorator(Target) {
             this.boxMouseOut = this.boxMouseOut.bind(this);
             this.borderMouseMove = this.borderMouseMove.bind(this);
             this.borderMouseUp = this.borderMouseUp.bind(this);
+
         }
         changePos(){
             this.setState({n:++this.state.n});
@@ -33,55 +39,57 @@ export default function editDecorator(Target) {
                 this.y = evt.clientY;
                 this.type = type;
                 server.emit('listItem:resize_start',type,{up:this.borderMouseUp,move:this.borderMouseMove});
+                !this.state.active && this.setState({active:true});
+                manage.currentId = this.component.id;
             }
         }
         borderMouseMove(evt){
             if(this.move) {
-                let dx,dy,com = this.props.component;
+                let dx,dy,{style}=this;
                 switch (this.type) {
                     case 'n': {
                         dy = evt.clientY - this.y;
-                        if(dy<=com.style.height){
-                            com.style.height -=dy;
-                            com.style.top += dy;
+                        if(dy<=style.height){
+                            style.height -=dy;
+                            style.top += dy;
                         }
                         break;
                     }
                     case 'e': {
                         dx = evt.clientX - this.x;
-                        if(-dx<=com.style.width){
-                            com.style.width +=dx;
+                        if(-dx<=style.width){
+                            style.width +=dx;
                         }
                         break;
                     }
                     case 's': {
                         dy = this.y - evt.clientY;
-                        if(dy<=com.style.height){
-                            com.style.height -=dy;
+                        if(dy<=style.height){
+                            style.height -=dy;
                         }
                         break;
                     }
                     case 'w': {
                         dx = evt.clientX - this.x;
-                        if(dx<=com.style.width){
-                            com.style.width -=dx;
-                            com.style.left += dx;
+                        if(dx<=style.width){
+                            style.width -=dx;
+                            style.left += dx;
                         }
                         break;
                     }
                     case 'se': {
                         dx = this.x - evt.clientX;
                         dy = this.y - evt.clientY;
-                        if(dx<=com.style.width&&dy<=com.style.height){
-                            com.style.width -=dx;
-                            com.style.height -=dy;
+                        if(dx<=style.width&&dy<=style.height){
+                            style.width -=dx;
+                            style.height -=dy;
                         }
                         break;
                     }
                     default:
                         break;
                 }
-                this.setState({n:++this.state.n});
+                manage.update(this.component.mergeIn(['style'],this.style),true);
                 this.x = evt.clientX;
                 this.y = evt.clientY;
             }
@@ -89,6 +97,7 @@ export default function editDecorator(Target) {
         borderMouseUp(evt){
             this.move = false;
             this.type = "";
+            manage.update(this.component.mergeIn(['style'],this.style));
         }
         getDropTarget(evt){
             let drops = document.querySelectorAll('#canvas .component'),currentZindex,target;
@@ -116,15 +125,16 @@ export default function editDecorator(Target) {
         boxMouseMove(evt){
             if(this.isMove){
                 let _x = evt.clientX - this.x,_y = evt.clientY - this.y;
-                this.props.component.style.left=this.startLeft + _x + this.boxParentDom.scrollLeft-this.parentScrollLeft;
-                this.props.component.style.top=this.startTop + _y + this.boxParentDom.scrollTop-this.parentScrollTop;
-                this.setState({drag:true});
+                this.style.left=this.startLeft + _x + this.boxParentDom.scrollLeft-this.parentScrollLeft;
+                this.style.top=this.startTop + _y + this.boxParentDom.scrollTop-this.parentScrollTop;
+                manage.update(this.component.mergeIn(['style'],this.style),true);
             }
         }
         boxMouseUp(evt){
             this.isMove = false;
             this.setState({drag:false});
             this.getDropTarget(evt);
+            manage.update(this.component.mergeIn(['style'],this.style));
         }
         boxMouseDown(evt){
             if(!this.isMove){
@@ -134,9 +144,12 @@ export default function editDecorator(Target) {
                 this.y=evt.clientY;
                 this.parentScrollLeft = this.boxParentDom.scrollLeft;
                 this.parentScrollTop = this.boxParentDom.scrollTop;
-                this.startLeft = this.props.component.style.left;
-                this.startTop = this.props.component.style.top;
+                this.startLeft = this.style.left;
+                this.startTop = this.style.top;
                 server.emit('listItem:box_start',{up:this.boxMouseUp,move:this.boxMouseMove,id:this.props.component.id});
+                server.emit('listItem:clear_active',this.component.id);
+                this.setState({drag:true,active:true});
+                manage.currentId = this.component.id;
             }
         }
         boxMouseOut(){
@@ -144,29 +157,47 @@ export default function editDecorator(Target) {
             this.setState({drag:false});
         }
         render(){
-            let com = this.props.component,style = com.getPosStyle();
+            let posStyle = this.style;
             return (
-                <div className={this.state.drag?"resizeBox drag":"resizeBox"} onMouseDown={this.boxMouseDown} style={style}>
+                <div className={(this.state.drag?"resizeBox drag":"resizeBox")+(this.state.active?' active':'')} onMouseDown={this.boxMouseDown} style={{...posStyle}}>
                     <Target {...this.props} isDrag={this.state.drag}>
                         {this.props.children}
                     </Target>
-                    <div className="n" onMouseDown={this.borderMouseDown.bind(this,'n')} style={{width:com.style.width,left:0,top:- 2}}></div>
-                    <div className="e" onMouseDown={this.borderMouseDown.bind(this,'e')} style={{height:com.style.height,right:-2,top:0}} ></div>
-                    <div className="s" onMouseDown={this.borderMouseDown.bind(this,'s')} style={{width:com.style.width,left:0,bottom:-2}}></div>
-                    <div className="w" onMouseDown={this.borderMouseDown.bind(this,'w')} style={{height:com.style.height,left:- 2,top:0}}></div>
+                    <div className="n" onMouseDown={this.borderMouseDown.bind(this,'n')} style={{width:posStyle.width,left:0,top:- 2}}></div>
+                    <div className="e" onMouseDown={this.borderMouseDown.bind(this,'e')} style={{height:posStyle.height,right:-2,top:0}} ></div>
+                    <div className="s" onMouseDown={this.borderMouseDown.bind(this,'s')} style={{width:posStyle.width,left:0,bottom:-2}}></div>
+                    <div className="w" onMouseDown={this.borderMouseDown.bind(this,'w')} style={{height:posStyle.height,left:- 2,top:0}}></div>
                     <div className="se" onMouseDown={this.borderMouseDown.bind(this,'se')} style={{right:-2,bottom:-2}}></div>
                 </div>)
+        }
+        componentWillUpdate(nextProps,nextState,nextContent){
+            this.style = nextProps.component.style.getPosStyle();
+            this.component = nextProps.component;
         }
         componentDidMount(){
             this.boxDom = findDOMNode(this);
             this.boxParentDom =  this.boxDom.parentElement;
 
+            server.emit('listItem:clear_active',this.component.id);
+            manage.currentId = this.component.id;
+
             server.on('listItem:resize_move', this.borderMouseMove);
             server.on('listItem:resize_end', this.borderMouseUp);
             server.on('listItem:box_move', this.boxMouseMove);
             server.on('listItem:box_end', this.boxMouseUp);
+            server.on('listItem:clear_active',this.clearActive =(currentActiveId)=>{
+                if(currentActiveId === this.component.id){
+                    return;
+                }
+                this.state.active && this.setState({active:false});
+            });
         }
         componentWillUnmount(){
+            server.off('listItem:resize_move', this.borderMouseMove);
+            server.off('listItem:resize_end', this.borderMouseUp);
+            server.off('listItem:box_move', this.boxMouseMove);
+            server.off('listItem:box_end', this.boxMouseUp);
+            server.off('listItem:clear_active',this.clearActive);
         }
     }
     return editBox;
