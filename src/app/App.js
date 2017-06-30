@@ -1,8 +1,6 @@
-/*import Parent from './Parent'*/
 import React from 'react';
 import ReactDOM from 'react-dom';
-import Canvas from './Canvas'
-/*ReactDOM.render(<Parent />, document.getElementById('content'))*/
-ReactDOM.render(<Canvas />, document.getElementById('content'))
+import Page from './Page';
+ReactDOM.render(<Page />, document.getElementById('page'));
 
 

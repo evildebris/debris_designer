@@ -8,7 +8,13 @@
 import Style from './style'
 import Immutable from '../../immutableSrc/immutable';
 import _ from '../../utils/utils'
-import componentMap from '../componentMap'
+let componentMap;
+
+setTimeout(()=>{
+    if(!componentMap){
+        componentMap = require( '../componentMap').default; //所有组件映射最后请求，避免出现请求闭环
+    }
+});
 
 function OwnerID() {};
 
@@ -21,7 +27,6 @@ function makeComponent(size, root, ownerID, hash){
     component.__altered = false;
     return component;
 }
-
 class Component extends Immutable.Map{
     constructor(offset,icon){
         let style=new Style({
@@ -55,11 +60,33 @@ class Component extends Immutable.Map{
         return newCom;
     }
     copy(){//深拷贝
-        let component = Object.create(Component.prototype);
+        let component = Object.create(Component.prototype),children=Immutable.List([]);
         component.size = this.size;
-        component.__ownerID = new OwnerID();
         component.__altered = false;
+        component.id = _.guid();
+        component.icon = this.icon;
 
+        component = component.set('style',new Style(this.style.toObject()));
+        component.style = component.get("style");
+        component = component.set('_attrs',this.get("_attrs"));
+        this.children.forEach((e,i)=>{
+            children = children.push(e.copy());
+        });
+        component = component.set('children',children);
+        component.children = children;
+
+        return component;
+    }
+    toJSON() {
+        let object = {};
+        this.__iterate(function (v, k) {
+            object[k] = v;
+        });
+        object.icon = this.icon;
+        object.id = this.id;
+        object.path = this.path;
+        object.parentId = this.parentId;
+        return object;
     }
     /**
      * @method 在每次修改Map对象时回调该方法
@@ -75,7 +102,7 @@ class Component extends Immutable.Map{
         }
     }
     set attrs(val){
-        if(Immutable.Map.isMap(val)) {
+        if(Immutable.Map.isMap(val)||_.isObject(val)) {
             this.set("_attrs", val);
         }
     }
@@ -120,4 +147,27 @@ class Component extends Immutable.Map{
     }
 }
 const ComponentPrototype = Component.prototype;
+Component.toComponent = function(comObj){
+    if(_.isObject(comObj)&&comObj.constructor!== Component){
+        let component = Object.create(Component.prototype),children=Immutable.List([]);
+        component.size = comObj.size;
+        component.__altered = false;
+        component.id = comObj.id;
+        component.icon = comObj.icon;
+        component.path = comObj.path;
+
+        component = component.set('style',new Style(comObj.style));
+        component.style = component.get("style");
+        component = component.set('_attrs',Immutable.Map(comObj._attrs));
+        comObj.children.forEach((e,i)=>{
+            if(_.isObject(e)) {
+                children = children.push(Component.toComponent(e));
+            }
+        });
+        component = component.set('children',children);
+        component.children = children;
+
+        return component;
+    }
+};
 export default Component;

@@ -9,7 +9,7 @@ class Server{
     constructor() {
         if (!Server.created) {
             Server.instance = this;
-            Server.created = true
+            Server.created = true;
             Server.instance.manage = manage;
         }
         return Server.instance
@@ -18,9 +18,9 @@ class Server{
         let cache ,event ,list;
         if(!callback) return;
         eventList = eventList.split(/,/);
-        cache = this._eventList || ( this._eventList = {})
+        cache = this._eventList || ( this._eventList = {});
         while((event = eventList.shift())){
-            list = cache[event] || (cache[event] = [])
+            list = cache[event] || (cache[event] = []);
             list.push({
                 f : callback
             })
@@ -61,5 +61,6 @@ class Server{
         }
     }
 }
+
 let server = new Server();
 export default server

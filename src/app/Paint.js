@@ -25,7 +25,7 @@ class Paint extends Component {
         </div>);
     }
     componentDidMount(){
-        let instance = this;
+        let instance = this,jsonData;
 
         manage.setPaintUpdate((components)=>{
             components && this.setState({
@@ -40,6 +40,14 @@ class Paint extends Component {
         window.addEventListener && window.addEventListener('keyup',(e)=>{
             let components ;
             switch (e.key){
+                /*case'a':{
+                    jsonData = manage.getJsonData();
+                    break;
+                }
+                case'r':{
+                    manage.recoveryFromJsonData(JSON.parse(jsonData));
+                    break;
+                }*/
                 case 'Delete':{
                     manage.remove();
                     break;
@@ -58,7 +66,17 @@ class Paint extends Component {
                 }
                 case 'c':{
                     if(e.ctrlKey){
-
+                        manage.setPlate();
+                        break;
+                    }
+                }
+                case 'v':{
+                    if(e.ctrlKey){
+                        let plateCom = manage.getPlate();
+                        if(plateCom){
+                            manage.add(plateCom.copy(),plateCom.parentId);
+                        }
+                        break;
                     }
                 }
                 default:

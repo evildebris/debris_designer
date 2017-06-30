@@ -21,7 +21,7 @@ ul,li{
     top: 0;
     box-shadow: 0px 1px 1px rgba(0,0,0,.3);
 }
-html,body{
+html,body,#page{
     background: #d0d0d0;
     width: 100%;
     height: 100%;
@@ -32,15 +32,11 @@ html,body{
     user-select:none;
     position: relative;
 }
-#content{
+#content,.content{
     width: 100%;
     height: calc(100% - 35px);
     position: relative;
     overflow: hidden;
-}
-#content>div,.content{
-    width: 100%;
-    height: 100%;
 }
 .content>*{
     float: left;
@@ -162,3 +158,44 @@ html,body{
     box-shadow: 3px 3px 3px rgba(0,0,0,.3), -3px -3px 3px rgba(0,0,0,.3);
     z-index: 9999;
 }
+/*------------------------------nav-----------------------------------*/
+.leftMenu{
+    width:183px;
+    height: 100%;
+    line-height: 35px;
+    margin-left: 17px;
+}
+.leftMenu>a{
+    width: 35px;
+    height: 100%;
+    line-height: 35px;
+    margin-right: 20px;
+    color: #939198;
+    font-size: 14px;
+    font-weight: bold;
+    text-decoration: none;
+    display: block;
+    float: left;
+}
+.leftMenu>a:active{
+    line-height: 37px;
+    color: #b5b3ba;
+}
+.leftMenu:after{
+    content: '';
+    clear: both;
+}
+.shadow{
+    background: rgba(0,0,0,.2);
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top:0;
+    display: none;
+}
+.shadow_content{
+    width: 500px;
+    height: 300px;
+}
+/*------------------------------nav-----------------------------------*/

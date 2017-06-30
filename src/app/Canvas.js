@@ -78,7 +78,7 @@ class Canvas extends Component {
     }
     render() {
         return (
-            <div className="content" onMouseMove={this.mouseMove.bind(this)} onMouseUp={this.mouseUp.bind(this)}>
+            <div id="content" className="content" onMouseMove={this.mouseMove.bind(this)} onMouseUp={this.mouseUp.bind(this)}>
                 <div id="drag_list" className="left_content">
                     <List></List>
                 </div>

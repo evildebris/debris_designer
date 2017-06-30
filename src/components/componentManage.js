@@ -1,7 +1,11 @@
 import Immutable from '../immutableSrc/immutable';
-import _ from '../utils/utils'
+import _ from '../utils/utils';
+import Component from './componentData/component';
 
 const maxHistory = 10;
+const history = [];
+const mapHistory = [];
+let plate = null;
 
 export default class componentManage {
     constructor(components){
@@ -14,9 +18,37 @@ export default class componentManage {
             });
             this.$$componetMap = Immutable.Map(componentMap);  //fromJS 深拷贝转化成
             this.$$components = Immutable.List(components);
-            this.history = [this.$$components];
-            this.mapHistory = [this.$$componetMap];
+
+            history.splice(0);
+            mapHistory.splice(0);
+            history.push(this.$$components);
+            mapHistory.push(this.$$componetMap);
             this.historyIndex = 0;
+        }
+    }
+    getJsonData(){
+        return JSON.stringify(this.$$components);
+    }
+    recoveryFromJsonData(json){
+        if(json&&_.isArray(json)){
+            let components = [],componentMap = {};
+            json.forEach((e,i)=>{
+                components[i] = Component.toComponent(e);
+            });
+            components.map((e,i)=> {
+                if (!componentMap[e.id]) {
+                    componentMap[e.id] = e;
+                }
+            });
+            this.$$componetMap = Immutable.Map(componentMap);
+            this.$$components = Immutable.List(components);
+
+            history.splice(0);
+            mapHistory.splice(0);
+            history.push(this.$$components);
+            mapHistory.push(this.$$componetMap);
+            this.historyIndex = 0;
+            this.updatePaint && this.updatePaint();
         }
     }
     getCurrentComponnets(){
@@ -24,24 +56,31 @@ export default class componentManage {
     }
     undo(){
         if(this.historyIndex){
-            this.$$components = this.history[--this.historyIndex];
-            this.$$componetMap = this.mapHistory[this.historyIndex];
+            this.$$components = history[--this.historyIndex];
+            this.$$componetMap = mapHistory[this.historyIndex];
             this.updatePaint && this.updatePaint();
             return this.$$components;
         }
         return null;
     }
     redo(){
-        if(this.history.length-1>this.historyIndex){
-            this.$$components = this.history[++this.historyIndex];
-            this.$$componetMap = this.mapHistory[this.historyIndex];
+        if(history.length-1>this.historyIndex){
+            this.$$components = history[++this.historyIndex];
+            this.$$componetMap = mapHistory[this.historyIndex];
             this.updatePaint && this.updatePaint();
             return this.$$components;
         }
         return null
     }
-    updateComponentImmutable(){
-
+    setPlate(){
+        if(this.currentId){
+            plate = this._hasComponent(this.currentId);
+        }
+    }
+    getPlate(){
+        if(plate){
+            return plate;
+        }
     }
     /**
      *  @method _hasComponent 判断当前缓存中是否还有该组件,
@@ -155,14 +194,14 @@ export default class componentManage {
     }
     updateHistory(){
         this.historyIndex++;
-        this.history.splice(this.historyIndex);
-        this.history.push(this.$$components);
-        this.mapHistory.splice(this.historyIndex);
-        this.mapHistory.push(this.$$componetMap);
+        history.splice(this.historyIndex);
+        history.push(this.$$components);
+        mapHistory.splice(this.historyIndex);
+        mapHistory.push(this.$$componetMap);
         if(this.historyIndex>maxHistory-1){
             this.historyIndex = maxHistory-1;
-            this.history.shift();
-            this.mapHistory.shift();
+            history.shift();
+            mapHistory.shift();
         }
     }
     setPaintUpdate(fn){
