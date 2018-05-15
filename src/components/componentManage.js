@@ -58,15 +58,34 @@ export default class componentManage {
         if(this.historyIndex){
             this.$$components = history[--this.historyIndex];
             this.$$componetMap = mapHistory[this.historyIndex];
+            this.refreshPath();
             this.updatePaint && this.updatePaint();
             return this.$$components;
         }
         return null;
     }
+    refreshPath(list){
+        if(!list) {list = this.$$components;}
+        list.forEach((component,key)=>{
+            if(!component.parentId){
+                component.path = key+'';
+            }else {
+                let parentComponent = this.$$componetMap.get(component.parentId);
+                component.path = parentComponent.path+".children."+key;
+            }
+
+            //判断是否需要递归
+            let children = component.get("children");
+            if(!children&&children.size){
+                this.refreshPath(children);
+            }
+        });
+    }
     redo(){
         if(history.length-1>this.historyIndex){
             this.$$components = history[++this.historyIndex];
             this.$$componetMap = mapHistory[this.historyIndex];
+            this.refreshPath();
             this.updatePaint && this.updatePaint();
             return this.$$components;
         }

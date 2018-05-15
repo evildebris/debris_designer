@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import server from '../utils/server'
 import List from './leftSlider/List'
 import DragItem from './leftSlider/DragItem'
+import RightSlider from './rightSlider/RightSlider'
 import Paint from './Paint'
 import {immutableRenderDecorator} from 'react-immutable-render-mixin';
 
@@ -85,7 +86,7 @@ class Canvas extends Component {
                 <div id="paint" className="canvas">
                     <Paint id="canvas" deleteComponent={this.state.deleteComponentId}></Paint>
                 </div>
-                <div id="attrEditor"></div>
+                <RightSlider></RightSlider>
                 <DragItem />
             </div>
         )

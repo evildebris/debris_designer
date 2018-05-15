@@ -159,7 +159,7 @@ export default function editDecorator(Target) {
         render(){
             let posStyle = this.style;
             return (
-                <div className={(this.state.drag?"resizeBox drag":"resizeBox")+(this.state.active?' active':'')} onMouseDown={this.boxMouseDown} style={{...posStyle}}>
+                <div className={(this.state.drag?"resizeBox drag":"resizeBox")+(this.state.active?' active':'')} key={this.component.id+"_edit"} onMouseDown={this.boxMouseDown} style={{...posStyle}}>
                     <Target {...this.props} isDrag={this.state.drag}>
                         {this.props.children}
                     </Target>

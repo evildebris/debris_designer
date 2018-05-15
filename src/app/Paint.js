@@ -13,6 +13,10 @@ class Paint extends Component {
             components:manage.$$components
         }
     }
+    get4uid(){
+        let now=new Date().getTime()+"";
+        return now.substring(now.length-4);
+    }
     render(){
         let components=[];
         this.state.components.forEach((e,i)=>{
