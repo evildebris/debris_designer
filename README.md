@@ -10,9 +10,9 @@
 * utils 实现的事件管理以及常用方法的封装
 
 ### 主要模块
-* src/components/componentData/component 继承Immutable.Map对象部分接口未重写完，还在读Immutable.js的源码 是组件数据源对象
+* src/components/componentData/component 继承Immutable.Map对象部分接口，还在读Immutable.js的源码 是组件数据源对象
 * src/components/component/editDecorator 组件编辑装饰器，在扩展react组件时可编辑组件可以加上声明@editDecorator
-* src/components/componentManage 实现整个画布的数据管理，包括回退、前进、增删该查，该模块还未写完
+* src/components/componentManage 实现整个画布的数据管理，包括回退、前进、增删该查
 
         6.21新加Immutable源码，修改Map源码，新加回调函数recoveryData
         6.23新加编辑功能ctrl_Z/ctrl_Y/delete 整套基于Immutable的数据对象的改写和管理已完成
